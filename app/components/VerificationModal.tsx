@@ -19,16 +19,18 @@ export default function VerificationModal({ open, onClose }: VerificationModalPr
 
   useEffect(() => {
     if (!open || modalStep !== 1) return;
+    const video = videoRef.current;
+    let mediaStream: MediaStream | null = null;
 
     const startCamera = async () => {
       try {
-        const mediaStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false });
+        mediaStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false });
         setStream(mediaStream);
-        if (videoRef.current) {
-          videoRef.current.srcObject = mediaStream;
-          await videoRef.current.play();
+        if (video) {
+          video.srcObject = mediaStream;
+          await video.play();
         }
-      } catch (error) {
+      } catch {
         setCameraError("Unable to access camera. Please allow camera permissions and try again.");
       }
     };
@@ -36,26 +38,20 @@ export default function VerificationModal({ open, onClose }: VerificationModalPr
     startCamera();
 
     return () => {
-      if (stream) {
-        stream.getTracks().forEach((track) => track.stop());
-      }
+      if (video) video.srcObject = null;
+      mediaStream?.getTracks().forEach((track) => track.stop());
     };
-  }, [open, stream, modalStep]);
-
-  useEffect(() => {
-    if (!open) {
-      setStream(null);
-      setCameraError(null);
-      setCapturedPhoto(null);
-      setModalStep(1);
-      setPhotos([]);
-    }
-  }, [open]);
+  }, [open, modalStep]);
 
   const closeModal = () => {
     if (stream) {
       stream.getTracks().forEach((track) => track.stop());
     }
+    setStream(null);
+    setCameraError(null);
+    setCapturedPhoto(null);
+    setModalStep(1);
+    setPhotos([]);
     onClose();
   };
 
@@ -113,21 +109,21 @@ export default function VerificationModal({ open, onClose }: VerificationModalPr
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 px-4 py-8 backdrop-blur-sm">
-      <div className="w-full max-w-2xl rounded-4xl border border-white/20 bg-white p-8 shadow-2xl shadow-slate-950/20">
+    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-slate-950/70 px-3 py-6 backdrop-blur-sm sm:px-4">
+      <div className="w-full max-w-2xl rounded-[30px] border border-white/20 bg-white p-5 shadow-2xl shadow-slate-950/20 sm:p-8">
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.35em] text-fuchsia-600">
               {modalStep === 3 ? "Verification Success" : "Show your vibe"}
             </p>
-            <h2 className="mt-3 text-3xl font-semibold text-slate-950">
-              {modalStep === 3 ? "Show your vibe" : modalStep === 2 ? "You&apos;re verified" : "Show your best face"}
+            <h2 className="mt-3 text-2xl font-semibold leading-tight text-slate-950 sm:text-3xl">
+              {modalStep === 3 ? "Show your vibe" : modalStep === 2 ? "You're verified" : "Show your best face"}
             </h2>
             <p className="mt-4 text-sm leading-6 text-slate-600">
               {modalStep === 1
-                ? "We&apos;re checking your identity so you can send verified invites."
+                ? "We're checking your identity so you can send verified invites."
                 : modalStep === 2
-                ? "No fake vibes here. You&apos;re almost in."
+                ? "No fake vibes here. You're almost in."
                 : "Add up to 6 photos people will actually vibe with."}
             </p>
           </div>
@@ -136,12 +132,12 @@ export default function VerificationModal({ open, onClose }: VerificationModalPr
             onClick={closeModal}
             className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-700 shadow-sm shadow-slate-900/5 transition hover:bg-slate-200"
           >
-            <span className="text-xl leading-none">×</span>
+            <span className="text-xl leading-none">x</span>
           </button>
         </div>
 
         {modalStep === 1 && (
-          <div className="mt-10 grid gap-6 rounded-4xl border border-slate-200 bg-slate-100 p-6 shadow-sm shadow-slate-900/5">
+          <div className="mt-8 grid gap-6 rounded-[28px] border border-slate-200 bg-slate-100 p-4 shadow-sm shadow-slate-900/5 sm:mt-10 sm:p-6">
             {cameraError ? (
               <div className="rounded-4xl bg-white p-8 text-center text-sm text-slate-700 shadow-sm shadow-slate-900/5">
                 <p className="font-semibold text-slate-900">Camera access required</p>
@@ -149,7 +145,7 @@ export default function VerificationModal({ open, onClose }: VerificationModalPr
               </div>
             ) : (
               <div className="overflow-hidden rounded-4xl bg-slate-950">
-                <div className="relative h-96 bg-slate-900">
+                <div className="relative h-80 bg-slate-900 sm:h-96">
                   <video ref={videoRef} className="h-full w-full object-cover" playsInline muted />
                   <div className="pointer-events-none absolute inset-x-0 top-0 h-full">
                     <div className="mx-auto mt-10 h-60 w-60 rounded-3xl border-2 border-white/70 bg-white/0 shadow-xl shadow-slate-950/20" />
@@ -158,7 +154,7 @@ export default function VerificationModal({ open, onClose }: VerificationModalPr
               </div>
             )}
 
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="space-y-2 text-sm text-slate-600">
                 <p className="font-semibold text-slate-950">Capture a clear selfie</p>
                 <p>Position your face in the frame and tap the button when ready.</p>
@@ -185,10 +181,10 @@ export default function VerificationModal({ open, onClose }: VerificationModalPr
         )}
 
         {modalStep === 2 && capturedPhoto && (
-          <div className="mt-10 grid gap-6 rounded-4xl border border-slate-200 bg-slate-100 p-6 shadow-sm shadow-slate-900/5">
-            <div className="rounded-4xl bg-white p-8 text-center shadow-sm shadow-slate-900/5">
+          <div className="mt-8 grid gap-6 rounded-[28px] border border-slate-200 bg-slate-100 p-4 shadow-sm shadow-slate-900/5 sm:mt-10 sm:p-6">
+            <div className="rounded-[28px] bg-white p-5 text-center shadow-sm shadow-slate-900/5 sm:p-8">
               <div className="relative mx-auto flex h-56 w-56 items-center justify-center rounded-full bg-slate-100 shadow-xl shadow-slate-900/10">
-                <img src={capturedPhoto} alt="Captured verification" className="h-52 w-52 rounded-full object-cover" />
+                <img src={capturedPhoto} alt="Captured verification" className="h-48 w-48 rounded-full object-cover sm:h-52 sm:w-52" />
                 <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 items-center gap-2 rounded-full bg-emerald-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-emerald-500/25">
                   <span>✓</span>
                   Verified
@@ -196,7 +192,7 @@ export default function VerificationModal({ open, onClose }: VerificationModalPr
               </div>
 
               <div className="mt-8 space-y-4">
-                <h3 className="text-3xl font-semibold text-slate-950">You&apos;re verified</h3>
+                <h3 className="text-2xl font-semibold text-slate-950 sm:text-3xl">You&apos;re verified</h3>
                 <p className="text-sm leading-6 text-slate-500">No fake vibes here. You&apos;re almost in.</p>
                 <div className="mx-auto mt-4 h-3 w-full max-w-xs overflow-hidden rounded-full bg-slate-200">
                   <div className="h-full w-[98.4%] rounded-full bg-violet-500" />
@@ -217,12 +213,12 @@ export default function VerificationModal({ open, onClose }: VerificationModalPr
         )}
 
         {modalStep === 3 && (
-          <div className="mt-10 space-y-6 rounded-4xl border border-slate-200 bg-slate-100 p-6 shadow-sm shadow-slate-900/5">
+          <div className="mt-8 space-y-6 rounded-[28px] border border-slate-200 bg-slate-100 p-4 shadow-sm shadow-slate-900/5 sm:mt-10 sm:p-6">
             <div className="space-y-3">
-              <div className="flex items-center justify-between gap-4">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <p className="text-sm uppercase tracking-[0.35em] text-slate-500">Show your vibe</p>
-                  <h3 className="text-3xl font-semibold text-slate-950">Add up to 6 photos people will actually vibe with</h3>
+                  <h3 className="text-2xl font-semibold leading-tight text-slate-950 sm:text-3xl">Add up to 6 photos people will actually vibe with</h3>
                 </div>
                 <span className="text-sm font-semibold text-slate-700">{photos.length}/6 added</span>
               </div>
@@ -240,7 +236,7 @@ export default function VerificationModal({ open, onClose }: VerificationModalPr
                 if (photo) {
                   return (
                     <div key={idx} className="relative overflow-hidden rounded-4xl bg-slate-900 shadow-sm shadow-slate-900/10">
-                      <img src={photo} alt={`Vibe ${idx + 1}`} className="h-52 w-full object-cover" />
+                      <img src={photo} alt={`Vibe ${idx + 1}`} className="h-40 w-full object-cover sm:h-52" />
                       <button
                         type="button"
                         onClick={() => removePhoto(idx)}
@@ -257,7 +253,7 @@ export default function VerificationModal({ open, onClose }: VerificationModalPr
                     key={idx}
                     type="button"
                     onClick={handleAddPhotoClick}
-                    className="flex h-52 flex-col items-center justify-center gap-3 rounded-4xl border border-dashed border-slate-300 bg-slate-200 text-slate-500 shadow-sm shadow-slate-900/5 transition hover:border-slate-400 hover:bg-slate-100"
+                    className="flex h-40 flex-col items-center justify-center gap-3 rounded-4xl border border-dashed border-slate-300 bg-slate-200 text-slate-500 shadow-sm shadow-slate-900/5 transition hover:border-slate-400 hover:bg-slate-100 sm:h-52"
                   >
                     <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-white text-2xl text-slate-700">+</span>
                     <span className="text-sm font-semibold">Add Photo</span>

@@ -98,7 +98,7 @@ const steps = [
   },
   {
     number: 3,
-    label: "They Accept — You're Set",
+    label: "They Accept - You're Set",
     description: "Once accepted, it's a confirmed plan. No endless chatting.",
     imageUrl: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=240&q=80",
   },
@@ -138,21 +138,21 @@ export default function Home() {
     <>
       <main
         style={{
-          background: "radial-gradient(circle at top, rgba(99,102,241,0.15), transparent 45%), radial-gradient(circle at right, rgba(236,72,153,0.12), transparent 35%), linear-gradient(180deg, #f8f5ff 0%, #f7f5ff 30%, #f3f2f8 100%)",
+          background: "radial-gradient(circle at top, rgba(99,102,241,0.14), transparent 42%), radial-gradient(circle at right, rgba(236,72,153,0.13), transparent 34%), linear-gradient(180deg, #f9f7ff 0%, #f5f3ff 42%, #f4f1f8 100%)",
         }}
-        className="min-h-screen px-4 py-8 text-slate-900 sm:px-6 lg:px-10"
+        className="min-h-screen overflow-x-hidden px-3 py-4 text-slate-900 sm:px-5 sm:py-6 lg:px-8"
       >
-        <div className="mx-auto flex max-w-full gap-8 xl:gap-10" style={{ minHeight: 760, maxWidth: 1480 }}>
+        <div className="mx-auto grid w-full max-w-[1800px] gap-5 lg:grid-cols-[minmax(210px,350px)_minmax(430px,900px)_minmax(280px,450px)] lg:gap-8">
           <Sidebar items={navigationItems} />
 
-          <section className="flex flex-1 flex-col gap-6">
-            <div className="flex flex-col gap-4 rounded-4xl border border-white/80 bg-white/80 px-6 py-5 shadow-2xl shadow-slate-900/10 backdrop-blur-xl">
-              <div className="inline-flex items-center gap-3 rounded-full bg-violet-600 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-white shadow-lg shadow-violet-500/20">
+          <section className="order-1 flex min-w-0 flex-col gap-5 lg:order-none">
+            <div className="flex flex-col gap-4 rounded-[28px] border border-white/80 bg-white/78 px-5 py-5 shadow-2xl shadow-slate-900/10 backdrop-blur-xl sm:rounded-[36px] sm:px-8 lg:px-8">
+              <div className="inline-flex w-full items-center rounded-full bg-violet-600 px-5 py-3 text-xs font-semibold uppercase tracking-[0.32em] text-white shadow-lg shadow-violet-500/20">
                 Explore Feed
               </div>
               <div className="flex flex-col gap-2">
-                <p className="text-sm uppercase tracking-[0.3em] text-slate-500">Discover new matches</p>
-                <h1 className="text-3xl font-semibold text-slate-950">Find your next plan tonight</h1>
+                <p className="text-xs uppercase tracking-[0.28em] text-slate-500 sm:text-sm sm:tracking-[0.32em]">Discover new matches</p>
+                <h1 className="text-3xl font-semibold leading-tight text-slate-950 sm:text-4xl lg:text-[2.35rem]">Find your next plan tonight</h1>
               </div>
             </div>
 
